@@ -1,20 +1,21 @@
 
 import React, {useState, useRef, useEffect} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, Alert} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 import Checkbox from '../components/Checkbox';
 import * as firebase from 'firebase';
 import "firebase/firestore";
 
-const PatientsScreen = () =>{
+const PatientsScreen = props =>{
 
     const logedInUserDBId = firebase.auth().currentUser.uid;
     const [name, setPatName] = useState('');
     const [isSort, setIsSort] = useState(false);
+    const [isInLine, setIsInLine] = useState(false);
     const refPatients = firebase.firestore().collection('Patients');
     const refDoctors = firebase.firestore().collection('Doctors');
-    refPatients.doc(logedInUserDBId).get().then(doc=> {const {name} = doc.data();
-                                                           setPatName(name);}).catch(error=> console.log('Get Data Error'));;
+    refPatients.doc(logedInUserDBId).get().then(doc=> {const {name, isInLine} = doc.data();
+                                                           setPatName(name); setIsInLine(isInLine)}).catch(error=> console.log('Get Data Error'));;
     
     const [ doctorsList, setDoctorsList ] = useState([]);
 
@@ -40,6 +41,22 @@ const PatientsScreen = () =>{
         
     }, [isSort]);
 
+    const makeAnAppointment =(item)=>{
+        if(isInLine){
+            Alert.alert('Error', 'You are already in the line');
+        }
+        else{
+            setIsInLine(true);
+            refPatients.doc(logedInUserDBId).update({"isInLine":isInLine});
+            refDoctors.doc(item.id).update({"waitingCounter": firebase.firestore.FieldValue.increment(1)});
+            var newWaiting={time: new Date().toLocaleString(),
+                doctorId: item.id,
+                doctorName: item.name}
+            //add to realtime database id=patientid
+            props.navigation.navigate('Appointment', newWaiting);
+        }
+    }
+
     return(
         <View style={styles.viewStyle}>
           <Text style={styles.titleStyle}>Hi {name}!</Text>
@@ -54,12 +71,13 @@ const PatientsScreen = () =>{
                     data={doctorsList}
                     renderItem={({ item }) => (
                         <ListItem
-                            bottomDivider
                             chevron    
-                            onPress={() => {}}>
+                            onPress={() => {makeAnAppointment(item)
+                                
+                            }}>
                             <Avatar source={require('../../assets/doc.png')} size={70} />
                             <ListItem.Content>
-                                <ListItem.Title>{item.name}</ListItem.Title>
+                                <ListItem.Title>Dr {item.name}</ListItem.Title>
                                 <ListItem.Subtitle>{item.specialization}</ListItem.Subtitle>
                                 <ListItem.Subtitle>Waiting: {item.waitingCounter.toString()}</ListItem.Subtitle>
                             </ListItem.Content>
@@ -88,11 +106,8 @@ const styles = StyleSheet.create({
         textAlign:'center',
         fontSize:18,
     },
-    listTextStyle:{
-        color:'black',
-    },
     viewListStyle:{
-        width:270, 
+        width:300, 
         alignSelf:'center',
         margin:25     
     },
