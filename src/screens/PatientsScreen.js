@@ -10,12 +10,14 @@ const PatientsScreen = props =>{
 
     const logedInUserDBId = firebase.auth().currentUser.uid;
     const [name, setPatName] = useState('');
+    const [id, setId] = useState('');
     const [isSort, setIsSort] = useState(false);
     const [isInLine, setIsInLine] = useState(false);
     const refPatients = firebase.firestore().collection('Patients');
     const refDoctors = firebase.firestore().collection('Doctors');
-    refPatients.doc(logedInUserDBId).get().then(doc=> {const {name, isInLine} = doc.data();
-                                                           setPatName(name); setIsInLine(isInLine)}).catch(error=> console.log('Get Data Error'));;
+    const refWaitingList = firebase.firestore().collection('WaitingList');
+    refPatients.doc(logedInUserDBId).get().then(doc=> {const {name, isInLine, id} = doc.data();
+                                                           setPatName(name); setIsInLine(isInLine); setId(id)}).catch(error=> console.log('Get Data Error'));;
     
     const [ doctorsList, setDoctorsList ] = useState([]);
 
@@ -35,7 +37,6 @@ const PatientsScreen = props =>{
                 list.sort((a,b)=>{return a.waitingCounter-b.waitingCounter});
             }
             setDoctorsList(list);
-            console.log(list);
         });
 
         
@@ -51,8 +52,10 @@ const PatientsScreen = props =>{
             refDoctors.doc(item.id).update({"waitingCounter": firebase.firestore.FieldValue.increment(1)});
             var newWaiting={time: new Date().toLocaleString(),
                 doctorId: item.id,
-                doctorName: item.name}
-            //add to realtime database id=patientid
+                doctorName: item.name,
+                patientName: name}
+
+            refWaitingList.doc(id).set(newWaiting);
             props.navigation.navigate('Appointment', newWaiting);
         }
     }
@@ -72,9 +75,7 @@ const PatientsScreen = props =>{
                     renderItem={({ item }) => (
                         <ListItem
                             chevron    
-                            onPress={() => {makeAnAppointment(item)
-                                
-                            }}>
+                            onPress={() => {makeAnAppointment(item)}}>
                             <Avatar source={require('../../assets/doc.png')} size={70} />
                             <ListItem.Content>
                                 <ListItem.Title>Dr {item.name}</ListItem.Title>

@@ -83,7 +83,7 @@ const LogginScreen = props =>{
                     val={isPat}
                     on_val_change={newVal=> {setIsPat(newVal); setIsDoc(!newVal)}}
           ></Checkbox>
-          <FlatButton text='Loggin' on_Press={makeLoggin}></FlatButton>
+          <FlatButton text='Login' on_Press={makeLoggin}></FlatButton>
           <Image style={styles.imageStyle} source={require('../../assets/doctor.png')}/>
         </View>
       );
