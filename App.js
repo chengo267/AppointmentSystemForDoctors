@@ -7,6 +7,7 @@ import LogginScreen from './src/screens/LogginScreen';
 import SignupDocScreen from './src/screens/SignupDocScreen';
 import SignupPatScreen from './src/screens/SignupPatScreen';
 import DoctorsScreen from './src/screens/DoctorsScreen';
+import PatientsScreen from './src/screens/PatientsScreen';
 import * as firebase from 'firebase';
 import "firebase/firestore";
 
@@ -32,7 +33,8 @@ const navigator = createStackNavigator(
     Loggin: LogginScreen,
     SignupDoc: SignupDocScreen,
     SignupPat: SignupPatScreen,
-    Doctors: DoctorsScreen
+    Doctors: DoctorsScreen,
+    Patients:PatientsScreen
   },
   {
     initialRouteName: "Loggin",

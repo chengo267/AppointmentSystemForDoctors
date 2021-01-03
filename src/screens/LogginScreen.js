@@ -34,10 +34,10 @@ const LogginScreen = props =>{
         }
         else{
             if(isDoc){
-
+                props.navigation.navigate('Doctors');
             }
             else{
-
+                props.navigation.navigate('Patients');
             }
         }
     }
@@ -45,8 +45,13 @@ const LogginScreen = props =>{
 
   const makeLoggin =()=>{
       if(isValidMail(email) && isValidPassword(password) && (isPat || isDoc)){
-        firebase.auth().createUserWithEmailAndPassword(email, password).
-            then((result)=>{ setUserObj(result)}).catch(error=> console.log(error));
+        firebase.auth().signInWithEmailAndPassword(email, password)
+        .catch(()=>{
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((result)=>{ setUserObj(result)})
+            .catch(error=> console.log(error));
+        })
+        .then((result)=>{ setUserObj(result)}).catch(error=> console.log(error));
       }
       else{
         Alert.alert('Error', 'Some details are not well filled');
