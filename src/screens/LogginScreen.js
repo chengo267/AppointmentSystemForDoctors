@@ -81,7 +81,7 @@ const LogginScreen = props =>{
             <TextInp text={'Password'}
                         val={password}
                         on_change_taxt={newPassword=> {setPassword(newPassword)}}
-                        secureTextEntry='true'
+                        secureTextEntry={true}
                         />
             <Text style={styles.passwordStyle}>At least 6 characters</Text>
             </View>

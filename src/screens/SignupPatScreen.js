@@ -6,6 +6,9 @@ import TextInp from '../components/TextInp';
 import FlatButton from '../components/FlatButton';
 import * as firebase from 'firebase';
 import "firebase/firestore";
+import Constants from 'expo-constants';
+import * as Permissions from 'expo-permissions';
+import * as Notifications from 'expo-notifications';
 
 const SignupPatScreen = props =>{
 
