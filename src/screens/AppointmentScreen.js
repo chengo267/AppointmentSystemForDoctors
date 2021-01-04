@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList,Alert} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 import FlatButton from '../components/FlatButton';
 import * as firebase from 'firebase';
@@ -26,8 +26,8 @@ const AppointmentScreen = props =>{
             querySnapshot.forEach(doc =>{
                 const {doctorId}=doc.data();
                 if(doctorId==docId){
-                    const {patientName, time}=doc.data();
-                    list.push({name: patientName, time: time});
+                    const {patientName, time, patientDBid}=doc.data();
+                    list.push({name: patientName, time: time, patientDBid:patientDBid});
                 }
             });
 
@@ -42,10 +42,15 @@ const AppointmentScreen = props =>{
     }, []);
 
     const cancelAppointment = () =>{
-        refWaitingList.doc(id).delete();
-        refPatients.doc(logedInUserDBId).update({"isInLine":false});
-        refDoctors.doc(docId).update({"waitingCounter": firebase.firestore.FieldValue.increment(-1)});
-        props.navigation.navigate('Patients');
+        if(waitingList[0].patientDBid=!logedInUserDBId){
+            refWaitingList.doc(id).delete();
+            refPatients.doc(logedInUserDBId).update({"isInLine":false});
+            refDoctors.doc(docId).update({"waitingCounter": firebase.firestore.FieldValue.increment(-1)});
+            props.navigation.navigate('Patients');
+        }
+        else{
+            Alert.alert('Error', "you can't cancel");
+        }
     }
 
     return(

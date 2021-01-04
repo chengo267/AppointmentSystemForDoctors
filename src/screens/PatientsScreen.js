@@ -52,7 +52,8 @@ const PatientsScreen = props =>{
             var newWaiting={time: new Date().toLocaleString(),
                 doctorId: item.id,
                 doctorName: item.name,
-                patientName: name}
+                patientName: name,
+                patientDBid: logedInUserDBId}
 
             firebase.firestore().collection('WaitingList').doc(id).set(newWaiting);
             props.navigation.navigate('Appointment', newWaiting);

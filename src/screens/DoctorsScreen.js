@@ -1,6 +1,5 @@
-
 import React, {useState, useRef, useEffect} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, Alert} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 import FlatButton from '../components/FlatButton';
 import Checkbox from '../components/Checkbox';
@@ -13,11 +12,14 @@ const DoctorsScreen = () =>{
     const [DocName, setDocName] = useState('');
     const [isActive, setIsActive]=useState(false);
     const [ waitingList, setWaitingList ] = useState([]);
+    const [currentPat, setCurrentPat] = useState(null);
     const logedInUserDBId = firebase.auth().currentUser.uid;
     const refDoctors = firebase.firestore().collection('Doctors');
     const refWaitingList = firebase.firestore().collection('WaitingList');
+    const refPatients = firebase.firestore().collection('Patients');
     refDoctors.doc(logedInUserDBId).get().then(doc=> {const {name, active} = doc.data();
-                                                           setDocName(name); setIsActive(active)}).catch(error=> console.log('Get Data Error'));;
+                                                           setDocName(name); setIsActive(active);})
+                                                           .catch(error=> console.log('Get Data Error'));;
     
     useEffect(()=>{
         refWaitingList.onSnapshot(querySnapshot =>{
@@ -25,8 +27,8 @@ const DoctorsScreen = () =>{
             querySnapshot.forEach(doc =>{
                 const {doctorId}=doc.data();
                 if(doctorId==logedInUserDBId){
-                    const {patientName, time,}=doc.data();
-                    list.push({name: patientName, time: time, patId: doc.id});
+                    const {patientName, time, patientDBid}=doc.data();
+                    list.push({name: patientName, time: time, patId: doc.id, patientDBid: patientDBid});
                 }
             });
 
@@ -37,12 +39,22 @@ const DoctorsScreen = () =>{
                 return dateA - dateB;});
             
             setWaitingList(list);
-            
+            if(waitingList!=null){
+                setCurrentPat(waitingList[0]);
+            }
         });
-    }, []);
+    }, [waitingList]);
     
     const getNext = ()=>{
-
+        if(waitingList.length > 0)
+        {
+            refPatients.doc(currentPat.patientDBid).update({"isInLine":false});
+            refDoctors.doc(logedInUserDBId).update({"waitingCounter": firebase.firestore.FieldValue.increment(-1)});
+            refWaitingList.doc(currentPat.patId).delete();
+        }
+        else{
+            Alert.alert('Error', 'Your waiting list is empty. Enjoy your rest.');
+        }
     }
 
     return(

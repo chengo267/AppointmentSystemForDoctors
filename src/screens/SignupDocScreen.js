@@ -1,8 +1,9 @@
 
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, Alert} from 'react-native';
 import TextInp from '../components/TextInp';
 import FlatButton from '../components/FlatButton';
+import {isFullName} from '../InputValidation';
 import * as firebase from 'firebase';
 import "firebase/firestore";
 
@@ -13,17 +14,22 @@ const SignupDocScreen = props =>{
   const refDoctors = firebase.firestore().collection('Doctors');
 
   const newDoctor = () => {
-    var newDocror={
-      name: name,
-      specialization: specialization,
-      email: props.navigation.getParam('email'),
-      password: props.navigation.getParam('password'),
-      active: false,
-      waitingCounter:0};
-
-      var userDBid= props.navigation.getParam('userObjId')
-      refDoctors.doc(userDBid).set(newDocror);
-      props.navigation.navigate('Doctors');
+    if(isFullName(name) && (specialization!=null)){
+      var newDocror={
+        name: name,
+        specialization: specialization,
+        email: props.navigation.getParam('email'),
+        password: props.navigation.getParam('password'),
+        active: false,
+        waitingCounter:0};
+  
+        var userDBid= props.navigation.getParam('userObjId')
+        refDoctors.doc(userDBid).set(newDocror);
+        props.navigation.navigate('Doctors');
+    }
+    else{
+      Alert.alert('Error', 'Some details are not well filled');
+    }
   }
 
     return(

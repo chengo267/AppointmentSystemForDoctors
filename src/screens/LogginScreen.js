@@ -34,9 +34,18 @@ const LogginScreen = props =>{
         }
         else{
             if(isDoc){
-                props.navigation.navigate('Doctors');
+                const refDoctors = firebase.firestore().collection('Doctors');
+                const doc = refDoctors.doc(userObj.uid);
+                if(doc){
+                    props.navigation.navigate('Doctors');
+                }
+                else{
+                    Alert.alert('Error', 'you are not a doctor');
+                }
             }
             else{
+                const refPatients = firebase.firestore().collection('Patients');
+
                 props.navigation.navigate('Patients');
             }
         }
@@ -74,6 +83,7 @@ const LogginScreen = props =>{
                         on_change_taxt={newPassword=> {setPassword(newPassword)}}
                         secureTextEntry='true'
                         />
+            <Text textAlign={'center'}>At least 6 characters</Text>
             </View>
           <Checkbox text='I am a doctor'
                     val={isDoc}
@@ -83,7 +93,7 @@ const LogginScreen = props =>{
                     val={isPat}
                     on_val_change={newVal=> {setIsPat(newVal); setIsDoc(!newVal)}}
           ></Checkbox>
-          <FlatButton text='Login' on_Press={makeLoggin}></FlatButton>
+          <FlatButton text='Login\Signup' on_Press={makeLoggin}></FlatButton>
           <Image style={styles.imageStyle} source={require('../../assets/doctor.png')}/>
         </View>
       );

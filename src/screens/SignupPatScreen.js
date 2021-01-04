@@ -1,6 +1,7 @@
 
 import React, {useState, useRef, useEffect} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, Alert} from 'react-native';
+import {isFullName, isId} from '../InputValidation';
 import TextInp from '../components/TextInp';
 import FlatButton from '../components/FlatButton';
 import * as firebase from 'firebase';
@@ -13,16 +14,21 @@ const SignupPatScreen = props =>{
   const refPatients = firebase.firestore().collection('Patients');
 
   const newPatient = () => {
-    var newPat={
-      name: name,
-      id: id,
-      email: props.navigation.getParam('email'),
-      password: props.navigation.getParam('password'),
-      isInLine: false};
-
-      var userDBid= props.navigation.getParam('userObjId')
-      refPatients.doc(userDBid).set(newPat);
-      props.navigation.navigate('Patients');
+    if(isFullName(name) && isId(id)){
+      var newPat={
+        name: name,
+        id: id,
+        email: props.navigation.getParam('email'),
+        password: props.navigation.getParam('password'),
+        isInLine: false};
+  
+        var userDBid= props.navigation.getParam('userObjId')
+        refPatients.doc(userDBid).set(newPat);
+        props.navigation.navigate('Patients');
+    }
+    else{
+      Alert.alert('Error', 'Some details are not well filled');
+    }
   }
 
     return(
