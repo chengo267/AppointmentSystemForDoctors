@@ -11,12 +11,13 @@ const PatientsScreen = props =>{
     const logedInUserDBId = firebase.auth().currentUser.uid;
     const [name, setPatName] = useState('');
     const [id, setId] = useState('');
+    const [token, setToken] = useState('');
     const [isSort, setIsSort] = useState(false);
     const [isInLine, setIsInLine] = useState(false);
     const refPatients = firebase.firestore().collection('Patients');
     const refDoctors = firebase.firestore().collection('Doctors');
-    refPatients.doc(logedInUserDBId).get().then(doc=> {const {name, isInLine, id} = doc.data();
-                                                           setPatName(name); setIsInLine(isInLine); setId(id)}).catch(error=> console.log('Get Data Error'));;
+    refPatients.doc(logedInUserDBId).get().then(doc=> {const {name, isInLine, id, token} = doc.data();
+                                                           setPatName(name); setIsInLine(isInLine); setId(id); setToken(token)}).catch(error=> console.log('Get Data Error'));;
     
     const [ doctorsList, setDoctorsList ] = useState([]);
 
@@ -49,11 +50,15 @@ const PatientsScreen = props =>{
             setIsInLine(true);
             refPatients.doc(logedInUserDBId).update({"isInLine":isInLine});
             refDoctors.doc(item.id).update({"waitingCounter": firebase.firestore.FieldValue.increment(1)});
-            var newWaiting={time: new Date().toLocaleString(),
+            refPatients.doc(logedInUserDBId).get().then(doc=> {const {token} = doc.data();
+                setToken(token)}).catch(error=> console.log('Get Data Error'));;
+
+            var newWaiting = {time: new Date().toLocaleString(),
                 doctorId: item.id,
                 doctorName: item.name,
                 patientName: name,
-                patientDBid: logedInUserDBId}
+                patientDBid: logedInUserDBId,
+                token: token}
 
             firebase.firestore().collection('WaitingList').doc(id).set(newWaiting);
             props.navigation.navigate('Appointment', newWaiting);

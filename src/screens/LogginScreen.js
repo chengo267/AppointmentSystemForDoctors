@@ -83,7 +83,7 @@ const LogginScreen = props =>{
                         on_change_taxt={newPassword=> {setPassword(newPassword)}}
                         secureTextEntry='true'
                         />
-            <Text textAlign={'center'}>At least 6 characters</Text>
+            <Text style={styles.passwordStyle}>At least 6 characters</Text>
             </View>
           <Checkbox text='I am a doctor'
                     val={isDoc}
@@ -93,7 +93,7 @@ const LogginScreen = props =>{
                     val={isPat}
                     on_val_change={newVal=> {setIsPat(newVal); setIsDoc(!newVal)}}
           ></Checkbox>
-          <FlatButton text='Login\Signup' on_Press={makeLoggin}></FlatButton>
+          <FlatButton text='Login' on_Press={makeLoggin}></FlatButton>
           <Image style={styles.imageStyle} source={require('../../assets/doctor.png')}/>
         </View>
       );
@@ -122,6 +122,11 @@ const styles = StyleSheet.create({
     },
     checkBoxStyle:{
         marginLeft:100
+    },
+    passwordStyle:{
+        alignSelf:'center',
+        fontSize:10,
+        marginBottom:10
     }
 })
 export default LogginScreen;

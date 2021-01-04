@@ -26,8 +26,9 @@ export function isId(id)
 }
 
 export function isFullName(name){
-   if(/^[a-zA-Z'- ]+$/.test(name))
+   if(/^[a-z]([-']?[a-z]+)*( [a-z]([-']?[a-z]+)*)+$/.test(name))
       return true;
    
    return false;
+
 }
