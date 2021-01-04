@@ -15,7 +15,6 @@ const PatientsScreen = props =>{
     const [isInLine, setIsInLine] = useState(false);
     const refPatients = firebase.firestore().collection('Patients');
     const refDoctors = firebase.firestore().collection('Doctors');
-    const refWaitingList = firebase.firestore().collection('WaitingList');
     refPatients.doc(logedInUserDBId).get().then(doc=> {const {name, isInLine, id} = doc.data();
                                                            setPatName(name); setIsInLine(isInLine); setId(id)}).catch(error=> console.log('Get Data Error'));;
     
@@ -55,7 +54,7 @@ const PatientsScreen = props =>{
                 doctorName: item.name,
                 patientName: name}
 
-            refWaitingList.doc(id).set(newWaiting);
+            firebase.firestore().collection('WaitingList').doc(id).set(newWaiting);
             props.navigation.navigate('Appointment', newWaiting);
         }
     }

@@ -1,12 +1,15 @@
-
 import React, {useState, useRef, useEffect} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, FlatList} from 'react-native';
+import { ListItem, Avatar } from 'react-native-elements';
+import FlatButton from '../components/FlatButton';
+import * as firebase from 'firebase';
+import "firebase/firestore";
 
 const AppointmentScreen = props =>{
 
     const logedInUserDBId = firebase.auth().currentUser.uid;
     const refPatients = firebase.firestore().collection('Patients');
-    const refWaitingList = firebase.firestore.collection('WaitingList');
+    const refWaitingList = firebase.firestore().collection('WaitingList');
     const refDoctors = firebase.firestore().collection('Doctors');
     const [id, setId] = useState('');
     refPatients.doc(logedInUserDBId).get().then(doc=> {const {id} = doc.data();
@@ -29,27 +32,43 @@ const AppointmentScreen = props =>{
             });
 
             //sort by arrival time
+            list.sort((a,b)=>{
+                var dateA = new Date(a.time);
+                var dateB = new Date(b.time);
+                return dateA - dateB;});
             
             setWaitingList(list);
         });
-
-        
     }, []);
 
     const cancelAppointment = () =>{
         refWaitingList.doc(id).delete();
         refPatients.doc(logedInUserDBId).update({"isInLine":false});
-        refDoctors.doc(docId).update({"waitingCounter": firebase.firestore.FieldValue.decriment(1)});
+        refDoctors.doc(docId).update({"waitingCounter": firebase.firestore.FieldValue.increment(-1)});
         props.navigation.navigate('Patients');
     }
 
     return(
-        <View>
-            <Text style={styles.titleStyle}>Dear {patName},</Text>
-            <Text style={styles.titleStyle}>you have an appointment with Dr {docName}.</Text>
+        <View style={styles.viewStyle}>
+            <Text style={styles.titleStyle} marginTop={20}>Dear {patName},</Text>
+            <Text style={styles.titleStyle}>you have an appointment with</Text>
+            <Text style={styles.titleStyle}>Dr {docName}.</Text>
             <Text style={styles.subtitleStyle}>Waiting List:</Text>
-
-            <Text>You can cancel the appointment as long as you have not received the notification that it is your turn</Text>
+            <View style={styles.viewListStyle}>
+                <FlatList 
+                    data={waitingList}
+                    renderItem={({ item }) => (
+                        <ListItem chevron>
+                            <Avatar source={require('../../assets/patient.png')} size={70} />
+                            <ListItem.Content>
+                                <ListItem.Title>{item.name}</ListItem.Title>
+                                <ListItem.Subtitle>{item.time}</ListItem.Subtitle>
+                            </ListItem.Content>
+                        </ListItem>)}
+                    keyExtractor={item => item.id}
+                    scrollEnabled/>
+            </View>
+            <Text style={styles.cancelDesStyle}>You have the option to cancel your appointment as long as you have not yet received a notification that your appointment has arrived, and the doctor is waiting for you</Text>
             <FlatButton text='Cancel' on_Press={cancelAppointment}></FlatButton>
         </View>
       );
@@ -65,8 +84,22 @@ const styles = StyleSheet.create({
     titleStyle:{
         fontWeight: 'bold',
         textAlign:'center',
-        fontSize:40,
-        marginTop:60
+        fontSize:20,
     },
+    subtitleStyle:{
+        textAlign:'center',
+        fontSize:18,
+        marginTop:20
+    },
+    viewListStyle:{
+        width:300, 
+        alignSelf:'center',
+        margin:25     
+    },
+    cancelDesStyle:{
+        textAlign:'center',
+        fontSize:15,
+    },
+    
 })
 export default AppointmentScreen;
