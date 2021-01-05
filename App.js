@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import fixTimerBug from './src/fixTimerBug';
 import { createAppContainer} from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import LogginScreen from './src/screens/LogginScreen';
@@ -11,10 +12,6 @@ import PatientsScreen from './src/screens/PatientsScreen';
 import AppointmentScreen from './src/screens/AppointmentScreen';
 import * as firebase from 'firebase';
 import "firebase/firestore";
-
-// import {decode, encode} from 'base-64';
-// if (!global.btoa) {  global.btoa = encode }
-// if (!global.atob) { global.atob = decode }
 
 
 const firebaseConfig = {

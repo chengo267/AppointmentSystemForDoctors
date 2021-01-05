@@ -48,7 +48,7 @@ const PatientsScreen = props =>{
         }
         else{
             setIsInLine(true);
-            refPatients.doc(logedInUserDBId).update({"isInLine":isInLine});
+            refPatients.doc(logedInUserDBId).update({"isInLine":true});
             refDoctors.doc(item.id).update({"waitingCounter": firebase.firestore.FieldValue.increment(1)});
             refPatients.doc(logedInUserDBId).get().then(doc=> {const {token} = doc.data();
                 setToken(token)}).catch(error=> console.log('Get Data Error'));;
@@ -88,7 +88,7 @@ const PatientsScreen = props =>{
                                 <ListItem.Subtitle>Waiting: {item.waitingCounter.toString()}</ListItem.Subtitle>
                             </ListItem.Content>
                         </ListItem>)}
-                    keyExtractor={item => item.id}
+                    keyExtractor={(item, index) => index.toString()}
                     scrollEnabled/>
             </View>
         </View>

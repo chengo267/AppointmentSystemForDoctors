@@ -70,7 +70,7 @@ const AppointmentScreen = props =>{
                                 <ListItem.Subtitle>{item.time}</ListItem.Subtitle>
                             </ListItem.Content>
                         </ListItem>)}
-                    keyExtractor={item => item.id}
+                    keyExtractor={(item, index) => index.toString()}
                     scrollEnabled/>
             </View>
             <Text style={styles.cancelDesStyle}>You have the option to cancel your appointment as long as you have not yet received a notification that your appointment has arrived, and the doctor is waiting for you</Text>

@@ -76,7 +76,7 @@ const DoctorsScreen = () =>{
                                 <ListItem.Subtitle>{item.patId}</ListItem.Subtitle>
                             </ListItem.Content>
                         </ListItem>)}
-                    keyExtractor={item => item.id}
+                    keyExtractor={(item, index) => index.toString()}
                     scrollEnabled/>
             </View>
             <FlatButton text='Get Next' on_Press={getNext}></FlatButton>

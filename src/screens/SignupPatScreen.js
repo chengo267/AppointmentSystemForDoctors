@@ -24,6 +24,7 @@ const SignupPatScreen = props =>{
       shouldSetBadge: false,
     }),
   });
+  
   registerForPushNotificationsAsync = async () => {
     if (Constants.isDevice) {
       const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
