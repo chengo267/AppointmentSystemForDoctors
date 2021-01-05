@@ -17,6 +17,13 @@ const SignupPatScreen = props =>{
   const [token, setToken] = useState('');
   const refPatients = firebase.firestore().collection('Patients');
 
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
   registerForPushNotificationsAsync = async () => {
     if (Constants.isDevice) {
       const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
@@ -46,8 +53,18 @@ const SignupPatScreen = props =>{
     }
     };
 
+    _handleNotification = notification => {
+      console.log(notification);
+    };
+  
+    _handleNotificationResponse = response => {
+      console.log(response);
+    };
+
   useEffect(()=>{
     registerForPushNotificationsAsync();
+    Notifications.addNotificationReceivedListener(_handleNotification);
+    Notifications.addNotificationResponseReceivedListener(_handleNotificationResponse);
   }, []);
 
 
